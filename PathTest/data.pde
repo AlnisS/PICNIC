@@ -10,9 +10,9 @@ class PathState {
     this.acc = acc;
   }
   void show() {
-    set((int) time, (int) pos, #FF0000);
-    set((int) time, (int) pos, #00FF00);
-    set((int) time, (int) pos, #0000FF);
+    set((int) time, (int) pos + 100, #FF0000);
+    set((int) time, (int) (vel * 40 + 100), #00FF00);
+    set((int) time, (int) (acc * 40 + 100), #0000FF);
   }
 }
 
