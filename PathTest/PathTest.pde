@@ -1,15 +1,29 @@
 void setup() {
   size(200, 200);
-  noLoop();
+  //noLoop();
 }
 
+float sv = -1.5;
+float ep = 0;
 void draw() {
   background(0);
   //PathData data = generateTestPath();
-  PathData data = generatePath(100, 0, 0, 0, 0, .2, .01);
-  data.show();
+  //println(mouseX * .015 - 1.5);
+  //generatePath(100, mouseX * .015 - 1.5, mouseY, 0, 2, .1, .01).show();
   //println(deltaVelocityToDeltaPosition(0, 1, 1, .01));
-  println("done");
+  //println("done");
+  
+  if (sv > 1.5) {
+    sv = -1.5;
+    ep += 5;
+  } else sv += .1;
+  println(sv, ep);
+  //generatePath(100, sv, ep, 0, 2, .1, .01).show();
+  new PathFactory(100, sv, ep, 0, 2, .1, .1).data.show();
+  //println("start");
+  //generatePath(100, 1.4, 90, 0, 2, .1, .01).show();
+  //new PathFactory(100, 0, 150, 0, 2, .1, .01).data.show();
+  //println("done");
 }
 
 PathData generatePath(float i_pos, float i_vel, float f_pos, float f_vel, float max_vel, float max_acc, float timestep) {
@@ -21,9 +35,17 @@ PathData generatePath(float i_pos, float i_vel, float f_pos, float f_vel, float 
   float acc = 0;
   
   float direction = f_pos > i_pos ? 1 : -1;
+  if (f_pos == i_pos) direction = i_vel < 0 ? 1 : -1;
   
-  while (abs(deltaVelocityToDeltaPosition(vel, 0, max_acc, timestep)) < abs(f_pos - pos)) {
+  while (abs(vel) < max_vel && abs(deltaVelocityToDeltaPosition(vel, 0, max_acc, timestep)) < abs(f_pos - pos)) {
     acc = max_acc * direction;
+    vel += acc * timestep;
+    pos += vel * timestep;
+    data.states.add(new PathState(time, pos, vel, acc));
+    time += timestep;
+  }
+  while (abs(deltaVelocityToDeltaPosition(vel, 0, max_acc, timestep)) < abs(f_pos - pos)) {
+    acc = 0;
     vel += acc * timestep;
     pos += vel * timestep;
     data.states.add(new PathState(time, pos, vel, acc));
@@ -35,6 +57,8 @@ PathData generatePath(float i_pos, float i_vel, float f_pos, float f_vel, float 
     pos += vel * timestep;
     data.states.add(new PathState(time, pos, vel, acc));
     time += timestep;
+    println(vel, max_acc);
+    delay(10);
   }
   data.states.add(new PathState(time, pos + vel * timestep, 0, -vel));
   
