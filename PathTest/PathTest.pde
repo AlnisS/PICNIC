@@ -5,9 +5,40 @@ void setup() {
 
 void draw() {
   background(0);
-  PathData data = generateTestPath();
+  //PathData data = generateTestPath();
+  PathData data = generatePath(100, 0, 0, 0, 0, .2, .01);
   data.show();
-  println(deltaVelocityToDeltaPosition(0, 1, 1, .01));
+  //println(deltaVelocityToDeltaPosition(0, 1, 1, .01));
+  println("done");
+}
+
+PathData generatePath(float i_pos, float i_vel, float f_pos, float f_vel, float max_vel, float max_acc, float timestep) {
+  PathData data = new PathData();
+  
+  float time = 0;
+  float pos = i_pos;
+  float vel = i_vel;
+  float acc = 0;
+  
+  float direction = f_pos > i_pos ? 1 : -1;
+  
+  while (abs(deltaVelocityToDeltaPosition(vel, 0, max_acc, timestep)) < abs(f_pos - pos)) {
+    acc = max_acc * direction;
+    vel += acc * timestep;
+    pos += vel * timestep;
+    data.states.add(new PathState(time, pos, vel, acc));
+    time += timestep;
+  }
+  while (abs(vel) > max_acc) {
+    acc = -max_acc * direction;
+    vel += acc * timestep;
+    pos += vel * timestep;
+    data.states.add(new PathState(time, pos, vel, acc));
+    time += timestep;
+  }
+  data.states.add(new PathState(time, pos + vel * timestep, 0, -vel));
+  
+  return data;
 }
 
 PathData generateTestPath() {
