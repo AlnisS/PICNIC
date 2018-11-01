@@ -14,16 +14,13 @@ void draw() {
   PathData testData = new PathFactory(0, sv, ep, 0, 2, .1, .01).data;
   testData.show();
   Actuator actuator = new Actuator();
+  PathExecutor pathExecutor = new PathExecutor(testData, actuator);
   
   for (float time = 0; time < 100; time += 1) {
-    PathState currentState = testData.getAtTime(time);
-    
-    // P term for Pf controller running path following
-    float pError = 1 * (currentState.pos - actuator.pos);
-    set((int) time, 100 + (int) pError, color(0, 255, 255));
-    
-    actuator.setVelocity(currentState.vel + pError);
+    pathExecutor.update(time);
     actuator.update(time);
+    
+    set((int) time, 100 + (int) pathExecutor.errorP, color(0, 255, 255));
     actuator.show();
   }
 }
