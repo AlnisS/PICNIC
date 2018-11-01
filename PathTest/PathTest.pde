@@ -10,5 +10,20 @@ void draw() {
     sv = -1.5;
     ep += 10;
   } else sv += .1;
-  new PathFactory(0, sv, ep, 0, 2, .1, .01).data.show();
+  
+  PathData testData = new PathFactory(0, sv, ep, 0, 2, .1, .01).data;
+  testData.show();
+  Actuator actuator = new Actuator();
+  
+  for (float time = 0; time < 100; time += 1) {
+    PathState currentState = testData.getAtTime(time);
+    
+    // P term for Pf controller running path following
+    float pError = 1 * (currentState.pos - actuator.pos);
+    set((int) time, 100 + (int) pError, color(0, 255, 255));
+    
+    actuator.setVelocity(currentState.vel + pError);
+    actuator.update(time);
+    actuator.show();
+  }
 }

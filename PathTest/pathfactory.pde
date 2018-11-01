@@ -21,6 +21,7 @@ class PathFactory {
     this.max_acc = max_acc;
     this.timestep = timestep;
     data = new PathData();
+    data.timestep = this.timestep;
     
     this.pos = i_pos;
     this.vel = i_vel;
@@ -42,6 +43,7 @@ class PathFactory {
       time += timestep;
     }
   }
+  
   void accelerateTowardsTarget() {
     while (abs(vel) < max_vel && canDo(f_vel, abs(f_pos - pos))) {
       acc = max_acc * direction(pos, f_pos);
@@ -51,6 +53,7 @@ class PathFactory {
       time += timestep;
     }
   }
+  
   void continueLinearly() {
     while (canDo(f_vel, abs(f_pos - pos))) {
       acc = 0;
@@ -60,6 +63,7 @@ class PathFactory {
       time += timestep;
     }
   }
+  
   void zeroPoint() {
     
   }
@@ -76,6 +80,7 @@ class PathFactory {
     }
     return pos;
   }
+  
   boolean canDo(float targvel, float distance) {
     return abs(displacementUntilVelocity(targvel)) < distance;
   }
