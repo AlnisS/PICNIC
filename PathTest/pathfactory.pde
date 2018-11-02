@@ -26,8 +26,9 @@ class PathFactory {
     this.pos = i_pos;
     this.vel = i_vel;
     
-    if (!(direction(i_pos, f_pos) == direction(0, vel) && canDo(f_vel, abs(f_pos - i_pos))))
-      cancelVelocity(0);
+    if (direction(i_pos, f_pos) != direction(0, vel)
+        || !canDo(f_vel, abs(f_pos - i_pos)))
+        cancelVelocity(0);
     
     accelerateTowardsTarget();
     continueLinearly();
@@ -67,6 +68,7 @@ class PathFactory {
   void zeroPoint() {
     
   }
+  
   float displacementUntilVelocity(float targvel) {
     float time = 0;
     float pos = 0;

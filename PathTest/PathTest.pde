@@ -3,24 +3,15 @@ void setup() {
 }
 
 float sv = -1.5;
-float ep = -100;
+float ep = 0;
 void draw() {
   background(0);
   if (sv > 1.5) {
     sv = -1.5;
     ep += 10;
   } else sv += .1;
-  
-  PathData testData = new PathFactory(0, sv, ep, 0, 2, .1, .01).data;
+  PathGenerator test = new PathGenerator(0, sv, ep, 1, 2, .1);
+  test.update();
+  PathData testData = test.getPathData(.1);
   testData.show();
-  Actuator actuator = new Actuator();
-  PathExecutor pathExecutor = new PathExecutor(testData, actuator);
-  
-  for (float time = 0; time < 100; time += 1) {
-    pathExecutor.update(time);
-    actuator.update(time);
-    
-    set((int) time, 100 + (int) pathExecutor.errorP, color(0, 255, 255));
-    actuator.show();
-  }
 }

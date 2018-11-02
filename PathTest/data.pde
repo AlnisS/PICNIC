@@ -32,7 +32,6 @@ class PathData {
   
   PathState getAtTime(float time) {
     int index = (int) (time / timestep);
-    println(time, timestep);
     if (states.size() == 0) return new PathState(0, 0, 0, 0);
     return index >= states.size() ? states.get(states.size() - 1) : states.get(index);
   }
