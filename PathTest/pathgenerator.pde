@@ -65,51 +65,72 @@ class PathGenerator {
   float f(float t) {
     return a1 * t * t + b1 * t;
   }
+  
+  float df(float t) {
+    return 2 * a1 * t + b1;
+  }
+  
+  float ddf(float t) {
+    return 2 * a1;
+  }
 
   // requires m2, a2, and b2
   float g(float t) {
     return m2 * (t - a2) + b2;
+  }
+  
+  float dg(float t) {
+    return m2;
+  }
+  
+  float ddg(float t) {
+    return 0;
   }
 
   // requires m3, a3, and b3
   float h(float t) {
     return m3 * (t - a3) * (t - a3) + b3;
   }
+  
+  float dh(float t) {
+    return m3 * 2 * t + m3 * 2 * -a3;
+  }
+  
+  float ddh(float t) {
+    return m3 * 2;
+  }
 
   PathData getPathData(float timestep) {
-    boolean two = a2 > i3;
-
     PathData pathData = new PathData();
     for (float time = 0; time < a3 + t1; time += timestep) {
-      float pos;
-      float vel;
-      float acc;
-      float a = 0;
-      float b = 0;
-      float c = 0;
-      if (two) {
-      } else {
-        if (time < a2) {
-          a = f(time);
-          b = f(time + .01);
-          c = f(time + .02);
-        } else if (a2 <= time && time < i3) {
-          a = g(time);
-          b = g(time + .01);
-          c = g(time + .02);
-        } else if (i3 <= time && time < i0) {
-          a = h(time);
-          b = h(time + .01);
-          c = h(time + .02);
-        }
-      }
-      pos = a;
-      vel = (b - a) / .01;
-      float vel2 = (c - b) / .01;
-      acc = (vel2 - vel) / .01;
-
-      pathData.states.add(new PathState(time, pos, vel, acc));
+      pathData.states.add(getAtTime(time));
     }
     return pathData;
+  }
+  
+  PathState getAtTime(float time) {
+    boolean two = a2 > i3;
+    
+    float pos = 0;
+    float vel = 0;
+    float acc = 0;
+    if (two) {
+      
+    } else {
+      if (time < a2) {
+        pos = f(time);
+        vel = df(time);
+        acc = ddf(time);
+      } else if (a2 <= time && time < i3) {
+        pos = g(time);
+        vel = dg(time);
+        acc = ddg(time);
+      } else if (i3 <= time && time < i0) {
+        pos = h(time);
+        vel = dh(time);
+        acc = ddh(time);
+      }
+    }
+    return new PathState(time, pos, vel, acc);
   }
 }
