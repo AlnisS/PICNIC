@@ -59,11 +59,18 @@ class PathGenerator {
     v1 = -b1 / (2 * a1);
     i4 = (a3 + v1) / 2;
     b4 = f(i4) - h(i4);
+    
+    //println(p_m1(1, 1, 5, 7));
+    //println((a3 - b1 / (2 * a1)) / 2);
   }
 
   // requres a1 and b1
   float f(float t) {
     return a1 * t * t + b1 * t;
+  }
+  
+  float f(float t, float a, float b) {
+    return a * t * t + b * t;
   }
   
   float df(float t) {
@@ -102,7 +109,10 @@ class PathGenerator {
 
   PathData getPathData(float timestep) {
     PathData pathData = new PathData();
-    for (float time = 0; time < a3 + t1; time += timestep) {
+    float end = a3 + t1;
+    if (a2 > i3)  // TODO: figure out why this works
+      end = (-p4 - m3 * 2 * -a3) / (m3 * 2) + parabolaOffset(a1, b1, a3, b3);
+    for (float time = 0; time < end; time += timestep) {
       pathData.states.add(getAtTime(time));
     }
     return pathData;
@@ -115,7 +125,18 @@ class PathGenerator {
     float vel = 0;
     float acc = 0;
     if (two) {
-      
+      float midpoint = q1(a1, b1, -p_m1(a1, b1, a3, b3), 1);
+      //println(q1(1.1, 4, 
+      if (time < midpoint) {
+        pos = f(time);
+        vel = df(time);
+        acc = ddf(time);
+      } else {
+        float o = parabolaOffset(a1, b1, a3, b3);
+        pos = h(time - o);
+        vel = dh(time - o);
+        acc = ddh(time - o);
+      }
     } else {
       if (time < a2) {
         pos = f(time);
@@ -133,4 +154,19 @@ class PathGenerator {
     }
     return new PathState(time, pos, vel, acc);
   }
+  
+  float p_m1(float a, float b, float h, float k) {
+    return (k + f(-b / (2 * a), a, b)) / 2;
+  }
+  
+  float parabolaOffset(float a, float b, float h, float k) {
+    float p_m1 = p_m1(a, b, h, k);
+    float p_r0 = q1(a, b, -p_m1, 1);
+    float p_r1 = q1(-a, 2 * a * h, -a * pow(h, 2) + k - p_m1, 1);
+    return p_r0 - p_r1;
+  }
+}
+
+float q1(float a0, float b0, float c0, float s0) {
+  return (-b0 + s0 * sqrt(pow(b0, 2) - 4 * a0 * c0)) / (2 * a0);
 }
