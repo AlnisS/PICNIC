@@ -19,26 +19,21 @@ class PathState {
 }
 
 class PathData {
-  ArrayList<PathState> states;
-  float timestep;
   
-  PathData() {
-    this(new ArrayList<PathState>());
-  }
+  PathGenerator pathGenerator;
   
-  PathData(ArrayList<PathState> states) {
-    this.states = states;
+  PathData(float i_p, float i_v, float f_p, float f_v, float m_v, float m_a) {
+    pathGenerator = new PathGenerator(i_p, i_v, f_p, f_v, m_v, m_a);
+    pathGenerator.update();
   }
   
   PathState getAtTime(float time) {
-    int index = (int) (time / timestep);
-    if (states.size() == 0) return new PathState(0, 0, 0, 0);
-    return index >= states.size() ? states.get(states.size() - 1) : states.get(index);
+    return pathGenerator.getAtTime(time);
   }
   
   void show() {
-    for (PathState state : states) {
-      state.show();
+    for (float time = 0; !pathGenerator.isDone(time); time += .1) {
+      pathGenerator.getAtTime(time).show();
     }
   }
 }

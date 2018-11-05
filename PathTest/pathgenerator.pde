@@ -93,17 +93,6 @@ class PathGenerator {
   float ddh(float t) {
     return seg3_square_coef * 2;
   }
-
-  PathData getPathData(float timestep) {
-    PathData pathData = new PathData();
-    float end = seg3_vertex_time + seg3_decceleration_time;
-    if (seg2_start_time > seg2_end_time)  // TODO: figure out why this works
-      end = (-target_velocity - seg3_square_coef * 2 * -seg3_vertex_time) / (seg3_square_coef * 2) + parabolaOffset(seg1_acceleration, seg1_start_speed, seg3_vertex_time, seg3_vertex_pos);
-    for (float time = 0; time < end; time += timestep) {
-      pathData.states.add(getAtTime(time));
-    }
-    return pathData;
-  }
   
   PathState getAtTime(float time) {
     boolean cannot_reach_max_vel = seg2_start_time > seg2_end_time;
@@ -150,6 +139,17 @@ class PathGenerator {
     float p1_end = quadratic_zero(acceleration, p1_initvel, -pos_midpoint, 1);
     float p2_start = quadratic_zero(-acceleration, 2 * acceleration * p2_vertex_time, -acceleration * pow(p2_vertex_time, 2) + p2_vertex_pos - pos_midpoint, 1);
     return p1_end - p2_start;
+  }
+  
+  float endTime() {
+    float end = seg3_vertex_time + seg3_decceleration_time;
+    if (seg2_start_time > seg2_end_time)  // TODO: figure out why this works
+      end = (-target_velocity - seg3_square_coef * 2 * -seg3_vertex_time) / (seg3_square_coef * 2) + parabolaOffset(seg1_acceleration, seg1_start_speed, seg3_vertex_time, seg3_vertex_pos);
+    return end;
+  }
+  
+  boolean isDone(float time) {
+    return time > endTime();
   }
 }
 
